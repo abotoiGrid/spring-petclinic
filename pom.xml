@@ -6,7 +6,11 @@
   <groupId>org.springframework.samples</groupId>
   <artifactId>spring-petclinic</artifactId>
   <version>3.3.0-SNAPSHOT</version>
-
+    <scm>
+        <connection>scm:git:git@github.com:abotoiGrid/spring-petclinic.git</connection>
+        <developerConnection>scm:git:git@github.com:abotoiGrid/spring-petclinic.git</developerConnection>
+        <url>https://github.com/abotoiGrid/spring-petclinic</url>
+    </scm>
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
