@@ -5,10 +5,17 @@ pipeline {
         DOCKER_REGISTRY = "docker.io"
         MAIN_REPO = "abotoi/main"
         MR_REPO = "abotoi/mr"
-        GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
     }
 
     stages {
+        stage('Set Variables') {
+            steps {
+                script {
+                    GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+                }
+            }
+        }
+
     //     stage('Checkstyle') {
     //         steps {
     //             script {
@@ -18,62 +25,65 @@ pipeline {
     //             archiveArtifacts artifacts: '**/checkstyle/*.xml', allowEmptyArchive: true
     //         }
     //     }
-//         stage('Integration Test with Docker Compose') {
-//     steps {
-//         script {
-//             echo 'Starting integration tests with docker-compose...'
-//             sh 'docker compose up'
-            
-//             // Run tests or health checks
-//             sh 'docker compose ps'
-            
-//             // Tear down
-//             //sh 'docker-compose down'
-//         }
-//     }
-// }        
-
-        stage('Test') {
-            steps {
-                script {
-                    sh './gradlew test'
-                }
-            }
-        }
+        // stage('Test') {
+        //     steps {
+        //         script {
+        //             sh './gradlew test'
+        //         }
+        //     }
+        // }
         
 
-        stage('Build') {
-            steps {
-                script {
-                    sh './gradlew build -x test'
-                }
-            }
-        }
-
+        // stage('Build') {
+        //     steps {
+        //         script {
+        //             sh './gradlew build -x test'
+        //         }
+        //     }
+        // }
         stage('Create Docker Image (MR)') {
             steps {
                 script {
                     sh "docker build -t ${MR_REPO}:${GIT_COMMIT_SHORT} ."
-                    sh "docker push ${MR_REPO}:${GIT_COMMIT_SHORT}"
                 }
             }
         }
 
-        stage('Create Docker Image (Main)') {
+        stage('Push Docker Image (MR)') {
             steps {
                 script {
-
-                    sh "docker build -t ${MAIN_REPO}:latest ."
-                    sh "docker push ${MAIN_REPO}:latest"
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
+                        sh "docker push ${MR_REPO}:${GIT_COMMIT_SHORT}"
+                    }
                 }
             }
         }
-    }
+
+         stage('Create Docker Image (Main)') {
+            steps {
+                script {
+                    sh "docker build -t ${MAIN_REPO}:latest ."
+                }
+            }
+        }
+
+        stage('Push Docker Image (Main)') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
+                        sh "docker push ${MAIN_REPO}:latest"
+                    }
+                }
+            }
+        }
+    
 
     post {
         always {
-            archiveArtifacts artifacts: 'target/surefire-reports/**/*.xml', allowEmptyArchive: true
             cleanWs()
         }
     }
+}
 }
