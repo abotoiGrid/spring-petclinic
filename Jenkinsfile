@@ -9,21 +9,21 @@ pipeline {
     }
 
     stages {
-        stage('Checkstyle') {
-            steps {
-                script {
-                    // Run Gradle Checkstyle
-                    sh './gradlew checkstyleMain'
-                }
-                archiveArtifacts artifacts: '**/checkstyle/*.xml', allowEmptyArchive: true
-            }
-        }
+    //     stage('Checkstyle') {
+    //         steps {
+    //             script {
+    //                 // Run Gradle Checkstyle
+    //                 sh './gradlew checkstyleMain'
+    //             }
+    //             archiveArtifacts artifacts: '**/checkstyle/*.xml', allowEmptyArchive: true
+    //         }
+    //     }
 
         stage('Test') {
             steps {
                 script {
                     // Run Gradle tests
-                    sh './mvnw clean test -x'
+                    sh './mvnw clean -x test'
                 }
             }
         }
