@@ -18,15 +18,36 @@ pipeline {
     //             archiveArtifacts artifacts: '**/checkstyle/*.xml', allowEmptyArchive: true
     //         }
     //     }
+        stages {
+        stage('Check Environment') {
+            steps {
+                script {
+                    // Print Java version and environment variables for comparison
+                    sh 'java -version'
+                    sh 'env'  // Prints all environment variables
+                    sh 'pwd'  // Prints the current working directory
+                }
+            }
+        }
 
         stage('Test') {
             steps {
                 script {
-                    // Run Gradle tests
+                    // Run Maven with debug logging enabled
                     sh './mvnw clean test'
                 }
             }
         }
+    }
+
+    post {
+        always {
+            // Archive the surefire reports for easy access
+            archiveArtifacts artifacts: 'target/surefire-reports/**/*.xml', allowEmptyArchive: true
+        }
+    }
+
+        
 
         stage('Build') {
             steps {
