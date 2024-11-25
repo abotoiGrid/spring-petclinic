@@ -18,7 +18,7 @@ pipeline {
     //             archiveArtifacts artifacts: '**/checkstyle/*.xml', allowEmptyArchive: true
     //         }
     //     }
-        stages {
+        
         stage('Check Environment') {
             steps {
                 script {
@@ -38,7 +38,7 @@ pipeline {
                 }
             }
         }
-    }
+    
 
     post {
         always {
