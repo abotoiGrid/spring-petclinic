@@ -6,7 +6,6 @@ pipeline {
         MAIN_REPO = "abotoi/main"
         MR_REPO = "abotoi/mr"
         GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-        SPRING_PROFILES_ACTIVE = 'postgres'
     }
 
     stages {
@@ -25,7 +24,7 @@ pipeline {
             steps {
                 script {
                     // Run Maven with debug logging enabled
-                    sh './mvnw clean test -Dspring.profiles.active=postgres'
+                    sh './gradlew clean test'
                 }
             }
         }
