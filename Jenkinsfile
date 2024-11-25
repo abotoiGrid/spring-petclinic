@@ -49,14 +49,6 @@ pipeline {
                 }
             }
         }
-        stage('Install Docker') {
-            steps {
-                sh '''
-                sudo apk update
-                sudo apk add --no-cache docker
-                '''
-            }
-        }
 
         stage('Create Docker Image (MR)') {
             steps {
