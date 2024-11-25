@@ -23,7 +23,7 @@ pipeline {
             steps {
                 script {
                     // Run Gradle tests
-                    sh './mvnw clean -x test'
+                    sh './mvnw clean test'
                 }
             }
         }
