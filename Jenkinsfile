@@ -24,7 +24,7 @@ pipeline {
             steps {
                 script {
                     // Run Maven with debug logging enabled
-                    sh './gradlew clean test'
+                    sh './gradlew test --no-daemon'
                 }
             }
         }
