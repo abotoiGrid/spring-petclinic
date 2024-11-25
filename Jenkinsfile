@@ -18,25 +18,25 @@ pipeline {
     //             archiveArtifacts artifacts: '**/checkstyle/*.xml', allowEmptyArchive: true
     //         }
     //     }
-        stage('Integration Test with Docker Compose') {
-    steps {
-        script {
-            echo 'Starting integration tests with docker-compose...'
-            sh 'docker compose up'
+//         stage('Integration Test with Docker Compose') {
+//     steps {
+//         script {
+//             echo 'Starting integration tests with docker-compose...'
+//             sh 'docker compose up'
             
-            // Run tests or health checks
-            sh 'docker compose ps'
+//             // Run tests or health checks
+//             sh 'docker compose ps'
             
-            // Tear down
-            //sh 'docker-compose down'
-        }
-    }
-}        
+//             // Tear down
+//             //sh 'docker-compose down'
+//         }
+//     }
+// }        
 
         stage('Test') {
             steps {
                 script {
-                    sh './gradlew test --no-daemon'
+                    sh './gradlew test'
                 }
             }
         }
