@@ -22,13 +22,13 @@ pipeline {
     steps {
         script {
             echo 'Starting integration tests with docker-compose...'
-            sh 'docker-compose up -d --build'
+            sh 'docker-compose up'
             
             // Run tests or health checks
             sh 'docker-compose ps'
             
             // Tear down
-            sh 'docker-compose down'
+            //sh 'docker-compose down'
         }
     }
 }        
