@@ -18,12 +18,24 @@ pipeline {
     //             archiveArtifacts artifacts: '**/checkstyle/*.xml', allowEmptyArchive: true
     //         }
     //     }
-        
+        stage('Integration Test with Docker Compose') {
+    steps {
+        script {
+            echo 'Starting integration tests with docker-compose...'
+            sh 'docker-compose up -d --build'
+            
+            // Run tests or health checks
+            sh 'docker-compose ps'
+            
+            // Tear down
+            sh 'docker-compose down'
+        }
+    }
+}        
 
         stage('Test') {
             steps {
                 script {
-                    // Run Maven with debug logging enabled
                     sh './gradlew test --no-daemon'
                 }
             }
@@ -33,7 +45,6 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    // Build project without running tests
                     sh './gradlew build -x test'
                 }
             }
@@ -42,9 +53,7 @@ pipeline {
         stage('Create Docker Image (MR)') {
             steps {
                 script {
-                    // Build the Docker image with the short Git commit hash
                     sh "docker build -t ${MR_REPO}:${GIT_COMMIT_SHORT} ."
-                    // Push the image to the "mr" Docker repository
                     sh "docker push ${MR_REPO}:${GIT_COMMIT_SHORT}"
                 }
             }
@@ -53,9 +62,8 @@ pipeline {
         stage('Create Docker Image (Main)') {
             steps {
                 script {
-                    // Build the Docker image
+
                     sh "docker build -t ${MAIN_REPO}:latest ."
-                    // Push the image to the "main" Docker repository
                     sh "docker push ${MAIN_REPO}:latest"
                 }
             }
@@ -64,7 +72,6 @@ pipeline {
 
     post {
         always {
-            // Clean up, if needed
             archiveArtifacts artifacts: 'target/surefire-reports/**/*.xml', allowEmptyArchive: true
             cleanWs()
         }
