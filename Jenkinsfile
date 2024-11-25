@@ -52,8 +52,8 @@ pipeline {
         stage('Install Docker') {
             steps {
                 sh '''
-                apk update
-                apk add --no-cache docker
+                sudo apk update
+                sudo apk add --no-cache docker
                 '''
             }
         }
