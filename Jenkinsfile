@@ -22,10 +22,10 @@ pipeline {
     steps {
         script {
             echo 'Starting integration tests with docker-compose...'
-            sh 'docker-compose up'
+            sh 'docker compose up'
             
             // Run tests or health checks
-            sh 'docker-compose ps'
+            sh 'docker compose ps'
             
             // Tear down
             //sh 'docker-compose down'
