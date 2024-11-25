@@ -38,15 +38,6 @@ pipeline {
                 }
             }
         }
-    
-
-    post {
-        always {
-            // Archive the surefire reports for easy access
-            archiveArtifacts artifacts: 'target/surefire-reports/**/*.xml', allowEmptyArchive: true
-        }
-    }
-
         
 
         stage('Build') {
@@ -81,5 +72,11 @@ pipeline {
         }
     }
 
-
+    post {
+        always {
+            // Clean up, if needed
+            archiveArtifacts artifacts: 'target/surefire-reports/**/*.xml', allowEmptyArchive: true
+            cleanWs()
+        }
+    }
 }
