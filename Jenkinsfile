@@ -49,6 +49,14 @@ pipeline {
                 }
             }
         }
+        stage('Install Docker') {
+            steps {
+                sh '''
+                apt-get update
+                apt-get install -y docker.io
+                '''
+            }
+        }
 
         stage('Create Docker Image (MR)') {
             steps {
