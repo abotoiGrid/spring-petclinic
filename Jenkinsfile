@@ -6,6 +6,7 @@ pipeline {
         MAIN_REPO = "abotoi/main"
         MR_REPO = "abotoi/mr"
         GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+        SPRING_PROFILES_ACTIVE = 'postgres'
     }
 
     stages {
@@ -19,22 +20,12 @@ pipeline {
     //         }
     //     }
         
-        stage('Check Environment') {
-            steps {
-                script {
-                    // Print Java version and environment variables for comparison
-                    sh 'java -version'
-                    sh 'env'  // Prints all environment variables
-                    sh 'pwd'  // Prints the current working directory
-                }
-            }
-        }
 
         stage('Test') {
             steps {
                 script {
                     // Run Maven with debug logging enabled
-                    sh './mvnw clean test'
+                    sh './mvnw clean test -Dspring.profiles.active=postgres'
                 }
             }
         }
