@@ -52,8 +52,8 @@ pipeline {
         stage('Install Docker') {
             steps {
                 sh '''
-                apt-get update
-                apt-get install -y docker.io
+                apk update
+                apk add --no-cache docker
                 '''
             }
         }
