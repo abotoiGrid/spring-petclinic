@@ -20,8 +20,24 @@ pipeline {
                 }
             }
         }
+        stage('Determine Pipeline Type') {
+            steps {
+                script {
+                    if (env.BRANCH_NAME == 'main') {
+                        currentBuild.description = "Main Branch Pipeline"
+                    } else if (env.CHANGE_ID) {
+                        currentBuild.description = "Merge Request Pipeline - PR #${env.CHANGE_ID}"
+                    } else {
+                        error("Unsupported branch type: ${env.BRANCH_NAME}")
+                    }
+                }
+            }
+        }
 
-    //     stage('Checkstyle') {
+    //     stage('Checkstyle') { 
+    //      when {
+    //          expression { env.CHANGE_ID != null } // Run for PRs only
+    //      }
     //         steps {
     //             script {
     //                 // Run Gradle Checkstyle
@@ -31,6 +47,9 @@ pipeline {
     //         }
     //     }
         // stage('Test') {
+        //     when {
+        //         expression { env.CHANGE_ID != null } // Run for PRs only
+        //     }
         //     steps {
         //         script {
         //             sh './gradlew test'
@@ -40,49 +59,27 @@ pipeline {
         
 
         // stage('Build') {
+        //     when {
+        //         expression { env.CHANGE_ID != null } // Run for PRs only
+        //     }
         //     steps {
         //         script {
         //             sh './gradlew build -x test'
         //         }
         //     }
         // }
-        stage('Create Docker Image (MR)') {
+        stage('Create and Push Docker Image') {
             steps {
                 script {
-                    sh "docker build -t ${MR_REPO}:${GIT_COMMIT_SHORT} ."
-                }
-            }
-        }
+                    def repo = env.CHANGE_ID != null ? MR_REPO : MAIN_REPO
+                    def tag = env.CHANGE_ID != null ? "${GIT_COMMIT_SHORT}" : "latest"
+                    sh "docker build -t ${DOCKER_REGISTRY}/${repo}:${tag} ."
 
-        stage('Push Docker Image (MR)') {
-            steps {
-                script {
                     withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh '''
                     echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
                     '''
-                    sh "docker push ${MR_REPO}:${GIT_COMMIT_SHORT}"
-                    }
-                }
-            }
-        }
-
-         stage('Create Docker Image (Main)') {
-            steps {
-                script {
-                    sh "docker build -t ${MAIN_REPO}:latest ."
-                }
-            }
-        }
-
-        stage('Push Docker Image (Main)') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    sh '''
-                    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
-                    '''
-                    sh "docker push ${MAIN_REPO}:latest"
+                        sh "docker push ${DOCKER_REGISTRY}/${repo}:${tag}"
                     }
                 }
             }
