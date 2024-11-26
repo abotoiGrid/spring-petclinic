@@ -46,13 +46,13 @@ pipeline {
         //         }
         //     }
         // }
-        // stage('Create Docker Image (MR)') {
-        //     steps {
-        //         script {
-        //             sh "docker build -t ${MR_REPO}:${GIT_COMMIT_SHORT} ."
-        //         }
-        //     }
-        // }
+        stage('Create Docker Image (MR)') {
+            steps {
+                script {
+                    sh "docker build -t ${MR_REPO}:${GIT_COMMIT_SHORT} ."
+                }
+            }
+        }
 
         stage('Push Docker Image (MR)') {
             steps {
