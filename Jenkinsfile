@@ -34,40 +34,39 @@ pipeline {
             }
         }
 
-    //     stage('Checkstyle') { 
-    //      when {
-    //          expression { env.CHANGE_ID != null } // Run for PRs only
-    //      }
-    //         steps {
-    //             script {
-    //                 // Run Gradle Checkstyle
-    //                 sh './gradlew checkstyleMain'
-    //             }
-    //             archiveArtifacts artifacts: '**/checkstyle/*.xml', allowEmptyArchive: true
-    //         }
-    //     }
-        // stage('Test') {
-        //     when {
-        //         expression { env.CHANGE_ID != null } // Run for PRs only
-        //     }
-        //     steps {
-        //         script {
-        //             sh './gradlew test'
-        //         }
-        //     }
-        // }
+        stage('Checkstyle') { 
+         when {
+             expression { env.CHANGE_ID != null } 
+         }
+            steps {
+                script {
+                    sh './gradlew checkstyleMain'
+                }
+                archiveArtifacts artifacts: '**/checkstyle/*.xml', allowEmptyArchive: true
+            }
+        }
+        stage('Test') {
+            when {
+                expression { env.CHANGE_ID != null }
+            }
+            steps {
+                script {
+                    sh './gradlew test'
+                }
+            }
+        }
         
 
-        // stage('Build') {
-        //     when {
-        //         expression { env.CHANGE_ID != null } // Run for PRs only
-        //     }
-        //     steps {
-        //         script {
-        //             sh './gradlew build -x test'
-        //         }
-        //     }
-        // }
+        stage('Build') {
+            when {
+                expression { env.CHANGE_ID != null }
+            }
+            steps {
+                script {
+                    sh './gradlew build -x test'
+                }
+            }
+        }
         stage('Create and Push Docker Image') {
             steps {
                 script {
