@@ -8,6 +8,11 @@ pipeline {
     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
         stage('Set Variables') {
             steps {
                 script {
@@ -41,18 +46,18 @@ pipeline {
         //         }
         //     }
         // }
-        stage('Create Docker Image (MR)') {
-            steps {
-                script {
-                    sh "docker build -t ${MR_REPO}:${GIT_COMMIT_SHORT} ."
-                }
-            }
-        }
+        // stage('Create Docker Image (MR)') {
+        //     steps {
+        //         script {
+        //             sh "docker build -t ${MR_REPO}:${GIT_COMMIT_SHORT} ."
+        //         }
+        //     }
+        // }
 
         stage('Push Docker Image (MR)') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'dockerhub', variable: 'DOCKER_PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh '''
                     echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
                     '''
@@ -73,7 +78,7 @@ pipeline {
         stage('Push Docker Image (Main)') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'dockerhub', variable: 'DOCKER_PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh '''
                     echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
                     '''
